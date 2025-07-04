@@ -1,14 +1,14 @@
 services:
   php:
     container_name: php
-    env_file: .env
     build:
       context: .container
       dockerfile: Dockerfile
       args:
+        USER: ${USER:-user}
         UID: ${UID:-1000}
         GID: ${GID:-1000}
-        USER: ${USER:-user}
+        ENVIRONMENT: ${APP_ENV:-production}
     restart: always
     ports:
       - "80:80" # HTTP
@@ -25,7 +25,6 @@ services:
   mongodb:
     container_name: mongodb
     image: mongo:latest
-    env_file: .env
     restart: unless-stopped
     hostname: mongodb
     tty: true
@@ -43,7 +42,6 @@ services:
   mongo-express:
     image: mongo-express:latest
     container_name: mongo-express
-    env_file: .env
     restart: unless-stopped
     ports:
       - "${MONGO_EXPRESS_PORT}:${MONGO_EXPRESS_PORT}"
@@ -63,7 +61,6 @@ services:
   redis:
     container_name: redis
     image: redis:alpine
-    env_file: .env
     restart: unless-stopped
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
