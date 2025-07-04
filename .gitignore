@@ -28,3 +28,11 @@ Thumbs.db
 /data
 *.sqlite
 *.db
+
+#package managers lock
+*.lock
+*-lock.json
+
+
+# ssr
+/bootstrap/ssr
