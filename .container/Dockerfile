@@ -1,13 +1,20 @@
 FROM dunglas/frankenphp:1.7.0-php8.4-alpine
 
 LABEL authors="Zaio Klepoyshkov <lisi4ok@gmail.com>"
+LABEL description="Alpine Linux | PHP 8.4 | FrankenPHP"
+LABEL version="0.0.1"
+LABEL extensions="php, composer, apcu, bcmath, bz2, calendar, exif, ftp, ffi, geos, grpc, swoole, gd, gettext, gmp, intl, imap, json, ldap, oauth, mbstring, mysqli, opcache, pcntl, pcov, pdo_mysql, pdo_pgsql, pdo_sqlite, pdo_sqlsrv, pdo_oci, pgsql, oci8, sqlsrv, mongodb, cassandra, redis, soap, solr, sockets, decimal, event, ev, dba, sync, csv, xml, yaml, xsl, xlswriter"
 
+ARG USER=${USER:-user}
 ARG UID=${UID:-1000}
-ARG UID=${UID:-1000}
-#ARG USER=${USER:-user}
+ARG GID=${GID:-1000}
+ARG ENVIRONMENT=${ENVIRONMENT:-production}
+# Set environment variables from PHP
+ARG PHP_INI_DIR=${PHP_INI_DIR:-"/usr/local/etc/php"}
 
 ENV UID=${UID}
 ENV GID=${GID}
+ENV ENVIRONMENT=${ENVIRONMENT}
 #ENV FRANKENPHP_CONFIG="worker /app/public/index.php"
 #ENV SERVER_NAME="phalcon.lo"
 
@@ -17,23 +24,29 @@ RUN set -eux; \
         bash \
         autoconf \
         automake \
-        bison \
         build-base \
         coreutils \
+        bison \
         ca-certificates \
+        tar \
+        xz \
         file \
-        g++ \
         gperf \
         libtool \
         pkgconf \
         openssl \
+        vim \
+        zip \
         unzip \
         wget \
         curl \
-        gnupg \
         gcc \
+        g++ \
         make \
+        m4 \
         re2c \
+        libc-dev \
+        pcre-dev \
         libpng-dev \
         libjpeg-turbo-dev \
         postgresql-dev \
@@ -44,6 +57,8 @@ RUN set -eux; \
         libgomp \
         freetype-dev \
         openssh-client \
+        imap-dev \
+        gmp-dev \
         imagemagick-dev \
     ;
 
@@ -56,17 +71,22 @@ RUN install-php-extensions \
     exif \
     ftp \
     ffi \
+    geos \
+    grpc \
     swoole \
     gd \
     gettext \
     gmp \
     intl \
+    imap \
     json \
     ldap \
+    oauth \
     mbstring \
     mysqli \
     opcache \
     pcntl \
+    pcov \
     pdo_mysql \
     pdo_pgsql \
     pdo_sqlite \
@@ -79,55 +99,69 @@ RUN install-php-extensions \
     cassandra \
     redis \
     soap \
+    solr \
     sockets \
+    decimal \
+    event \
+    ev \
+    dba \
+    sync \
+    csv \
     xml \
     yaml \
+    xsl \
     xlswriter \
-    uuid \
+    xpass \
+    xmldiff \
+    xmlrpc \
+    uv \
     uuid \
     timezonedb \
     tidy \
     yar \
     xdebug \
     zip \
+    uploadprogress \
     zmq \
+    nsq \
+    pq \
+    zstd \
     amqp \
     shmop \
+    inotify \
     ssh2 \
-    xsl \
-    yaml \
     imagick \
     psr \
     zephir_parser \
     phalcon \
     ;
 
-# Configure GD extension (only needed if gd is in the list)
-RUN set -eux; \
-    docker-php-ext-configure gd --with-freetype --with-jpeg;
+# Configure GD extension
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg; \
 
 # Configure php.ini
-RUN cp $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini; \
-    sed -i "s/^memory_limit = .*/memory_limit = -1/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^max_execution_time = .*/max_execution_time = 60/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^display_errors = .*/display_errors = On/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^display_startup_errors = .*/display_startup_errors = On/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^log_errors = .*/log_errors = Off/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^memory_limit = .*/memory_limit = -1/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^post_max_size = .*/post_max_size = 10G/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^upload_max_filesize = .*/upload_max_filesize = 5G/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^max_input_vars = .*/max_input_vars = 10000/" $PHP_INI_DIR/php.ini; \
+RUN \
+    cp ${PHP_INI_DIR}/php.ini-${ENVIRONMENT} ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^display_errors = .*/display_errors = On/" ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^display_startup_errors = .*/display_startup_errors = On/" ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^log_errors = .*/log_errors = Off/" ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^memory_limit = .*/memory_limit = -1/" ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^max_execution_time = .*/max_execution_time = 0/" ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^post_max_size = .*/post_max_size = 10G/" ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^upload_max_filesize = .*/upload_max_filesize = 5G/" ${PHP_INI_DIR}/php.ini; \
 
 # Final cleanup
 RUN set -eux; \
     apk del .build-deps; \
     rm -rf /var/cache/apk/*; \
 
-#USER "${USER}"
+# Set user
+#RUN \
+#    adduser --system --no-create-home --gid=${GID} --uid=${UID} ${USER}; \
+#    setcap -r /usr/local/bin/frankenphp; \
+#    chown -R ${USER}:${USER} /data/caddy; \
+#    chown -R ${USER}:${USER} /config/caddy; \
+#    chown -R ${USER}:${USER} /app; \
 #
-#RUN set -eux; \
-#    addgroup --system -g "${GID}" "${USER}"; \
-#    adduser --system -D -s /bin/sh -u "${UID}" -G "${USER}" "${USER}"; \
-#    # Ensure necessary directories are owned by the new user
-#    chown -R "${USER}":"${USER}" /data/caddy; \
-#    chown -R "${USER}":"${USER}" /config/caddy;
+#
+#USER ${USER}
