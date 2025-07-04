@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use RectorLaravel\Set\LaravelLevelSetList;
+use RectorLaravel\Set\LaravelSetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -25,5 +27,8 @@ return RectorConfig::configure()
         earlyReturn: true,
         strictBooleans: true,
     )
-    //->withPhpSets()
-;
+    ->withSets([
+        LaravelLevelSetList::UP_TO_LARAVEL_120,
+        LaravelSetList::LARAVEL_120,
+        LaravelSetList::LARAVEL_CODE_QUALITY,
+    ]);
