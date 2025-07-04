@@ -10,6 +10,7 @@
         "final_class": true,
         "final_internal_class": false,
         "ordered_types": true,
+        "no_empty_comment": true,
         "final_public_method_for_abstract_class": true,
         "fully_qualified_strict_types": true,
         "global_namespace_import": {
