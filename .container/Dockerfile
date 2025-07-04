@@ -137,23 +137,24 @@ RUN install-php-extensions \
     ;
 
 # Configure GD extension
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg; \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg;
 
 # Configure php.ini
-RUN \
-    cp ${PHP_INI_DIR}/php.ini-${ENVIRONMENT} ${PHP_INI_DIR}/php.ini; \
+RUN cp -if ${PHP_INI_DIR}/php.ini-production ${PHP_INI_DIR}/php.ini; \
     sed -i "s/^display_errors = .*/display_errors = On/" ${PHP_INI_DIR}/php.ini; \
     sed -i "s/^display_startup_errors = .*/display_startup_errors = On/" ${PHP_INI_DIR}/php.ini; \
     sed -i "s/^log_errors = .*/log_errors = Off/" ${PHP_INI_DIR}/php.ini; \
     sed -i "s/^memory_limit = .*/memory_limit = -1/" ${PHP_INI_DIR}/php.ini; \
     sed -i "s/^max_execution_time = .*/max_execution_time = 0/" ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^max_input_time = .*/max_input_time = -1/" ${PHP_INI_DIR}/php.ini; \
     sed -i "s/^post_max_size = .*/post_max_size = 10G/" ${PHP_INI_DIR}/php.ini; \
     sed -i "s/^upload_max_filesize = .*/upload_max_filesize = 5G/" ${PHP_INI_DIR}/php.ini; \
+    sed -i "s/^error_reporting = .*/error_reporting = E_ALL/" ${PHP_INI_DIR}/php.ini;
 
 # Final cleanup
 RUN set -eux; \
     apk del .build-deps; \
-    rm -rf /var/cache/apk/*; \
+    rm -rf /var/cache/apk/*;
 
 # Set user
 #RUN \
