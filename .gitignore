@@ -1,3 +1,4 @@
+#Laravel
 *.log
 .DS_Store
 .env
@@ -22,3 +23,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+#Data
+/data
+*.sqlite
+*.db
