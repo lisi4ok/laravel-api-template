@@ -31,5 +31,4 @@ return RectorConfig::configure()
         LaravelLevelSetList::UP_TO_LARAVEL_120,
         LaravelSetList::LARAVEL_120,
         LaravelSetList::LARAVEL_CODE_QUALITY,
-    ])
-;
+    ]);
