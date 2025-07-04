@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->reportable(fn(Throwable $e) => new JsonResponse([
+        $exceptions->reportable(fn (Throwable $e) => new JsonResponse([
             'status' => 'error',
             'message' => $e->getMessage(),
         ], $e->getCode()));
