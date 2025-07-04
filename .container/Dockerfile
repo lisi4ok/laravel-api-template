@@ -116,7 +116,6 @@ RUN cp $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini; \
     sed -i "s/^memory_limit = .*/memory_limit = -1/" $PHP_INI_DIR/php.ini; \
     sed -i "s/^post_max_size = .*/post_max_size = 10G/" $PHP_INI_DIR/php.ini; \
     sed -i "s/^upload_max_filesize = .*/upload_max_filesize = 5G/" $PHP_INI_DIR/php.ini; \
-    sed -i "s/^max_input_vars = .*/max_input_vars = 10000/" $PHP_INI_DIR/php.ini; \
 
 # Final cleanup
 RUN set -eux; \
