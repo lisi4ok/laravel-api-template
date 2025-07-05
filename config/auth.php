@@ -43,6 +43,8 @@ return [
             'provider' => 'users',
         ],
         'api' => [
+            //            'driver' => 'jwt',
+            //            'driver' => 'custom-token',
             'driver' => 'passport',
             'provider' => 'users',
         ],
