@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Http\Middleware\AddRequestContext;
-use App\Http\Middleware\RequestAcceptsJson;
-use App\Http\Middleware\SupportsJsonContentType;
-use App\Http\Middleware\ValidateJson;
+use App\Http\Middleware\RequestsJson;
+use App\Http\Middleware\ResponsesJson;
+use App\Http\Middleware\InteractsWithJson;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,12 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend([
             AddRequestContext::class,
-            ValidateJson::class,
-            //            RequestAcceptsJson::class,
-        ]);
-        $middleware->append([
-            //            SupportsJsonContentType::class,
-            //            AddRequestContext::class,
+        ])->prependToGroup('api', [
+            RequestsJson::class,
+        ])->appendToGroup('api', [
+            ResponsesJson::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -37,6 +35,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 'headers' => $e->getHeaders(),
                 'code' => $e->getStatusCode(),
                 'message' => $e->getMessage(),
-            ], $e->getStatusCode(), [], JSON_PRETTY_PRINT);
+            ], $e->getStatusCode(), [
+                'Content-Type' => 'application/json, application/vnd.api+json'
+            ], JSON_PRETTY_PRINT);
         });
     })->create();

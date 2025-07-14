@@ -10,24 +10,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
 
-final class ValidateJson
+final class RequestsJson
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->isJson()) {
-            throw new UnsupportedMediaTypeHttpException(
-                'Unsupported Media Type'
-            );
+        if (!$request->wantsJson()) {
+            throw new NotAcceptableHttpException('Not Acceptable');
         }
-        if (! $request->wantsJson()) {
-            throw new NotAcceptableHttpException(
-                'Not Acceptable'
-            );
+
+        if (!$request->isJson()) {
+            throw new UnsupportedMediaTypeHttpException('Unsupported Media Type');
         }
 
         return $next($request);
